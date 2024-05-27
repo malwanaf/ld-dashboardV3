@@ -18,12 +18,12 @@ socket.on("connect", () => {
     });
 
     console.log("svelte is connected");
-    dbstatus.set("connected");
+    dbstatus.set("green");
 });
 
 socket.on("disconnect", () => {
     console.log("svelte is DISKONEK !!!");
-    dbstatus.set("disconnected");
+    dbstatus.set("red");
 });
 
 export default socket;

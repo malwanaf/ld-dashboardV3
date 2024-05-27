@@ -31,12 +31,8 @@
     import { strikesresult } from '$lib/stores/strikes.ts';
     import { dbstatus } from '$lib/stores/dbstatus.ts';
 
+    // watch $dbstatus
     $: console.log($dbstatus);
-    if ($dbstatus == 'connected') {
-        websocketIndicatorColor = 'green';
-    } else {
-        websocketIndicatorColor = 'red';
-    }
 
     // Functions
     function formatDate(date) {
@@ -132,7 +128,7 @@
         </span>
         <span class="flex items-center space-x-1">
             <span class="text-sm text-gray-500">DB:</span>
-            <span class="h-3 w-3 rounded-full" style="background-color: {websocketIndicatorColor};"></span>
+            <span class="h-3 w-3 rounded-full" style="background-color: {$dbstatus};"></span>
         </span>
         <Button on:click={toggleMode} variant="outline" size="icon">
             <Sun class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"/>

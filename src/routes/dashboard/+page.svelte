@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Import statements
 	import type { LatLngExpression } from 'leaflet';
-	import Leaflet from '$lib/components/map/Leaflet.svelte';
+	import Leaflet from '$lib/components/map/Leaflet2.svelte';
 	import Marker from '$lib/components/map/Marker.svelte';
 	import Popup from '$lib/components/map/Popup.svelte';
 	import { Switch } from '$lib/components/ui/switch';
@@ -11,6 +11,11 @@
 	import ChevronRight from 'svelte-radix/ChevronRight.svelte';
 	import { Label } from '$lib/components/ui/label/';
 	import { Input } from '$lib/components/ui/input';
+
+    import DigitalClock from '$lib/components/DigitalClock.svelte';
+
+    // var
+    let websocketIndicatorColor = 'red';
 
     // Import Stores
     import { strikesresult } from '$lib/stores/strikes.ts';
@@ -35,25 +40,34 @@
 
 
   </script>
+
+
   
   <!-- HTML Structure -->
+  <div class="absolute z-20 m-2 w-max top-0 left-0">
+    
+      <DigitalClock />
+  </div>
+  
   <div class="absolute z-20 m-2 w-max top-0 right-0">
-	<a href="/customtable">
+	<a href="/data-table">
 	  <Button variant="secondary" class="">
 		Go to data-viewer
 		<ChevronRight class="h-4 w-4" />
 	  </Button>
 	</a>
   </div>
+
+
   
-  <div class="absolute bottom-0 left-0 z-30 m-2 w-max">
-	<div class="alert-area mb-2">
+  <div class="absolute bottom-0 left-0 z-30 w-max">
+	<div class="alert-area">
   {#each $strikesresult.slice().slice(-1) as strike}
     <Alert.Root variant="default" class="m-2 bg-opacity-70 border-opacity-10">
       <ExclamationTriangle class="h-4 w-4" />
       <Alert.Title>Latest Strike</Alert.Title>
       <Alert.Description>
-        {strike.time} - {strike.distance} - {strike.intensity}
+        {strike.time} - {strike.distance} km - {strike.intensity}
       </Alert.Description>
     </Alert.Root>
 	
@@ -65,7 +79,7 @@
   
   <div class="z-0 h-screen w-full">
 	<!-- Leaflet Map -->
-	<Leaflet view={initialView} zoom={14}>
+	<Leaflet view={initialView} zoom={12}>
 	  {#each markerLocations as latLng}
 		<Marker {latLng} width={40} height={40}>
 		  <!-- Icon -->
