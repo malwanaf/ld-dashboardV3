@@ -1,6 +1,6 @@
 import {io} from 'socket.io-client';
-import { updateStrikesResult } from './stores/strikes';
 import { dbstatus } from './stores/dbstatus';
+import { updateStrikesResult } from './stores/strikes';
 
 const socket = io("http://localhost:3000/");
 
