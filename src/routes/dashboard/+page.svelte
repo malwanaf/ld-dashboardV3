@@ -83,6 +83,9 @@
         document.body.removeChild(link);
     } catch (error) {
         console.error('Error exporting to CSV:', error);
+    }
+}
+
 
     function handleSort(column) {
         if (sortBy === column) {
