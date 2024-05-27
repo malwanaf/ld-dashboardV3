@@ -43,6 +43,7 @@
 	"dependencies": {
 		"bits-ui": "^0.21.10",
 		"clsx": "^2.1.1",
+		"leaflet": "^1.9.4",
 		"mode-watcher": "^0.3.0",
 		"radix-svelte": "^0.9.0",
 		"socket.io-client": "^4.7.5",
