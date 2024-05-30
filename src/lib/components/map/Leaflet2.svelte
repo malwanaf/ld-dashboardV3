@@ -62,9 +62,6 @@
 
 		const unsubscribe = strikesresult.subscribe((strikesData) => {
 			strikesData.forEach((strike) => {
-				console.log(
-					`Strike ID: ${strike.id}, Time: ${strike.time}, Distance: ${strike.distance}, Intensity: ${strike.intensity}`
-				);
 				const radius = calculateRadius(strike.distance);
 				const circle = L.circle(center, {
 					color: 'yellow', // Border color
