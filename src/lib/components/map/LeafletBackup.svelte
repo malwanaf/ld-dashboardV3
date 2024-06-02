@@ -57,16 +57,10 @@
 
 		const unsubscribe = strikesresult.subscribe((strikesData) => {
 			let delay = 0;
-			const currentTime = new Date();
-
-			const marginSeconds = 1; // Set margin time in seconds
-			const adjustedCurrentTime = new Date(currentTime.getTime() - marginSeconds * 1000);
 
 			strikesData.forEach((strike) => {
-				const strikeTime = new Date(strike.time);
-
-				// Only process strikes with a timestamp >= currentTime
-				if (strikeTime >= adjustedCurrentTime  && !processedStrikes.has(strike.id)) {
+				// Check if the strike has already been processed
+				if (!processedStrikes.has(strike.id)) {
 					delay += 0; // Delay for each data point to simulate real-time
 
 					setTimeout(() => {
@@ -183,3 +177,4 @@
 		animation: fadeInOut 5s ease forwards;
 	}
 </style>
+

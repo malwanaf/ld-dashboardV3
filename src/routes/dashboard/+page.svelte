@@ -57,7 +57,7 @@
 
 <div class="absolute bottom-0 left-0 z-30 w-max">
 	<LightningPopup />
-	<div class="alert-area">
+	<!-- <div class="alert-area">
 		{#each $strikesresult.slice().slice(-1) as strike}
 			<Alert.Root variant="default" class="m-2 border-opacity-10 bg-opacity-70">
 				<ExclamationTriangle class="h-4 w-4" />
@@ -67,7 +67,7 @@
 				</Alert.Description>
 			</Alert.Root>
 		{/each}
-	</div>
+	</div> -->
 </div>
 
 <div class="z-0 h-screen w-full">
