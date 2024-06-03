@@ -46,7 +46,14 @@
 				<ExclamationTriangle class="h-4 w-4" />
 				<Alert.Title>Latest Strike</Alert.Title>
 				<Alert.Description>
-					{strike.time} - {strike.distance} km - <Badge>{strike.intensity}</Badge>
+					{strike.time} - {strike.distance} km - 
+          {#if strike.intensity == 1}
+            <Badge variant="blue">{strike.intensity}</Badge>
+          {:else if strike.intensity > 1 && strike.intensity <= 10}
+            <Badge variant="warning">{strike.intensity}</Badge>
+          {:else}
+            <Badge variant="destructive">{strike.intensity}</Badge>
+          {/if}
 				</Alert.Description>
 			</Alert.Root>
 		</div>

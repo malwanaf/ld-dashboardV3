@@ -13,8 +13,14 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Badge } from '$lib/components/ui/badge';
 	import LightningPopup from '$lib/components/Popup/LightningPopup.svelte';
+	import LightningBolt from 'svelte-radix/LightningBolt.svelte';
+	import Accessibility from 'svelte-radix/Accessibility.svelte';
+	import { fade } from 'svelte/transition';
+	import StrikeIndicator from '$lib/components/Popup/StrikeIndicator.svelte';
+	
 
 	import DigitalClock from '$lib/components/DigitalClock.svelte';
+	
 
 	// var
 	let websocketIndicatorColor = 'red';
@@ -37,6 +43,8 @@
 
 	// watch $strikesresult for latest strike
 	$: latestStrike = $strikesresult.length ? $strikesresult[$strikesresult.length - 1] : null;
+
+	
 </script>
 
 <!-- HTML Structure -->
@@ -44,6 +52,8 @@
 	<Badge variant="secondary">
 		<DigitalClock />
 	</Badge>
+
+	<StrikeIndicator />
 </div>
 
 <div class="absolute right-0 top-0 z-20 m-2 w-max">
