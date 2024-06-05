@@ -1,99 +1,121 @@
 <script>
-	// Imports
-	import Sun from 'svelte-radix/Sun.svelte';
-	import Moon from 'svelte-radix/Moon.svelte';
-	import CaretSort from 'svelte-radix/CaretSort.svelte';
-	import { toggleMode } from 'mode-watcher';
-	import { Button } from '$lib/components/ui/button';
-	import { onMount, onDestroy } from 'svelte';
-	import * as Table from '$lib/components/ui/table';
-	import ChevronLeft from 'svelte-radix/ChevronLeft.svelte';
-	import * as Pagination from '$lib/components/ui/pagination';
-	import Reload from 'svelte-radix/Reload.svelte';
-	import { Label } from '$lib/components/ui/label';
-	import * as Select from '$lib/components/ui/select';
-	import { strikesresult } from '$lib/stores/strikes.ts';
-	import { dbstatus } from '$lib/stores/dbstatus.ts';
+    import Sun from 'svelte-radix/Sun.svelte';
+    import Moon from 'svelte-radix/Moon.svelte';
+    import CaretSort from 'svelte-radix/CaretSort.svelte';
+    import { toggleMode } from 'mode-watcher';
+    import { Button } from '$lib/components/ui/button';
+    import { onMount, onDestroy } from 'svelte';
+    import * as Table from '$lib/components/ui/table';
+    import ChevronLeft from 'svelte-radix/ChevronLeft.svelte';
+    import * as Pagination from '$lib/components/ui/pagination';
+    import Reload from 'svelte-radix/Reload.svelte';
+    import { Label } from '$lib/components/ui/label';
+    import * as Select from '$lib/components/ui/select';
+    import { strikesresult } from '$lib/stores/strikes.ts';
+    import { dbstatus } from '$lib/stores/dbstatus.ts';
+    import { specificstrikesresult } from '$lib/stores/specificStrike';
 
-	let currentPage = 1;
-	let itemsPerPage = 10;
-	let rowsPerPageOptions = [5, 10, 20, 50];
-	let isLoading = false;
-	let latestStrike = '';
-	let sortBy = 'time'; // Default sorting by time
-	let sortOrder = 'ASC'; // Default sorting order
+    let currentPage = 1;
+    let itemsPerPage = 10;
+    let rowsPerPageOptions = [5, 10, 20, 50];
+    let isLoading = false;
+    let latestStrike = '';
+    let sortBy = 'time';
+    let sortOrder = 'ASC';
 
-	// watch $dbstatus
-	$: console.log($dbstatus);
+    $: console.log($dbstatus);
+    $: latestStrike = $strikesresult.length ? $strikesresult[$strikesresult.length - 1] : null;
 
-	// watch $strikesresult for latest strike
-	$: latestStrike = $strikesresult.length ? $strikesresult[$strikesresult.length - 1] : null;
+    function handleItemsPerPageChange(event) {
+        itemsPerPage = parseInt(event.detail);
+        currentPage = 1;
+    }
 
-	function handleItemsPerPageChange(event) {
-		itemsPerPage = parseInt(event.detail);
-		currentPage = 1; // Reset to the first page
-	}
+    function exportToCSV() {
+        try {
+            if (!$strikesresult.length) {
+                console.error('No data to export');
+                return;
+            }
 
-	function exportToCSV() {
-		try {
-			if (!$strikesresult.length) {
-				console.error('No data to export');
-				return;
-			}
+            const headers = Array.from(new Set($strikesresult.flatMap(Object.keys)));
+            const csvContent = [
+                headers.join(','),
+                ...$strikesresult.map(item =>
+                    headers.map(header =>
+                        item[header] != null ? String(item[header]).replace(/"/g, '""') : ''
+                    ).join(',')
+                )
+            ].join('\n');
 
-			const headers = Array.from(new Set($strikesresult.flatMap(Object.keys)));
-			const csvContent = [
-				headers.join(','),
-				...$strikesresult.map(item =>
-					headers.map(header =>
-						item[header] != null ? String(item[header]).replace(/"/g, '""') : ''
-					).join(',')
-				)
-			].join('\n');
+            const encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'data.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Error exporting to CSV:', error);
+        }
+    }
 
-			const encodedUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
-			const link = document.createElement('a');
-			link.setAttribute('href', encodedUri);
-			link.setAttribute('download', 'data.csv');
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-		} catch (error) {
-			console.error('Error exporting to CSV:', error);
-		}
-	}
+    function handleSort(column) {
+        if (sortBy === column) {
+            sortOrder = sortOrder === 'ASC' ? 'DESC' : 'ASC';
+        } else {
+            sortBy = column;
+            sortOrder = 'ASC';
+        }
 
-	function handleSort(column) {
-		if (sortBy === column) {
-			sortOrder = sortOrder === 'ASC' ? 'DESC' : 'ASC';
-		} else {
-			sortBy = column;
-			sortOrder = 'ASC';
-		}
+        $strikesresult = $strikesresult.slice().sort((a, b) => {
+            if (sortOrder === 'ASC') {
+                return a[column] > b[column] ? 1 : -1;
+            } else {
+                return a[column] < b[column] ? 1 : -1;
+            }
+        });
+    }
 
-		$strikesresult = $strikesresult.slice().sort((a, b) => {
-			if (sortOrder === 'ASC') {
-				return a[column] > b[column] ? 1 : -1;
-			} else {
-				return a[column] < b[column] ? 1 : -1;
-			}
-		});
-	}
+    $: paginatedItems = $strikesresult.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-	// watch $strikesresult for pagination
-	$: paginatedItems = $strikesresult.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    function showSpecificStrike(id) {
+        console.log('showing strike with id:', id);
+        specificstrikesresult.set($strikesresult.filter(strike => strike.id === id));
+    }
+
+    function hideSpecificStrike(id) {
+        console.log('hiding strike with id:', id);
+        specificstrikesresult.set($specificstrikesresult.filter(strike => strike.id != id));
+    }
+
+    function toggleShowSpecificStrike(id) {
+        if ($specificstrikesresult.filter(strike => strike.id === id).length > 0) {
+            hideSpecificStrike(id);
+        } else {
+            showSpecificStrike(id);
+        }
+    }
+
+    function isStrikeVisible(id) {
+        return $specificstrikesresult.filter(strike => strike.id === id).length > 0;
+    }
+
+    $: console.log($specificstrikesresult);
+
+    // // Separate state to track toggle states
+    // let toggleStates = strikesresult.map(() => false);
+
+    // // Function to toggle the state
+    // function toggle(index) {
+    //     toggleStates[index] = !toggleStates[index];
+    // }
 </script>
 
 <div class="flex flex-col h-full overflow-hidden p-4">
     <div class="mb-2 flex flex-col sm:flex-row items-center justify-between">
         <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-            <a href="/dashboard" class="w-full sm:w-auto">
-                <Button class="flex items-center space-x-1 w-full sm:w-auto">
-                    <ChevronLeft class="h-4 w-4" />
-                    Back to Dashboard
-                </Button>
-            </a>
-            <Button on:click={exportToCSV} class="mt-2 sm:mt-0" variant="secondary">Export to CSV</Button>
+            <Button on:click={exportToCSV} class="mt-2 sm:mt-0" variant="default">Export to CSV</Button>
         </div>
         <div class="flex items-center space-x-2 mt-2 sm:mt-0">
             <span class="text-sm text-gray-600 dark:text-gray-200 w-full sm:w-auto">
@@ -149,10 +171,13 @@
                                     Distance<CaretSort class="h-4 w-4" />
                                 </Button>
                             </Table.Head>
-                            <Table.Head class="text-left">
+                            <Table.Head class="text-center">
                                 <Button class="text-left pl-0" variant="ghost" on:click={() => handleSort('intensity')}>
                                     Intensity<CaretSort class="h-4 w-4" />
                                 </Button>
+                            </Table.Head>
+                            <Table.Head class="text-center">
+                                Actions
                             </Table.Head>
                         </Table.Row>
                     </Table.Header>
@@ -172,7 +197,15 @@
                                     <Table.Cell class="text-left">{strike.id}</Table.Cell>
                                     <Table.Cell class="text-left">{strike.time}</Table.Cell>
                                     <Table.Cell class="text-left">{strike.distance} km</Table.Cell>
-                                    <Table.Cell class="text-left">{strike.intensity}</Table.Cell>
+                                    <Table.Cell class="text-center">{strike.intensity}</Table.Cell>
+                                    <Table.Cell class="text-center">
+                                        <!-- <Button on:click={() => toggleShowSpecificStrike(strike.id)}>
+                                            {isStrikeVisible(strike.id) ? 'Hide from Map' : 'Show on Map'}
+                                        </Button> -->
+                                        <!-- <Button on:click={() => toggle(index)}>
+                                            {toggleStates[index] ? 'Deactivate' : 'Activate'}
+                                        </Button> -->
+                                    </Table.Cell>
                                 </Table.Row>
                             {/each}
                         {/if}

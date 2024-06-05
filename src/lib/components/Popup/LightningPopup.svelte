@@ -7,6 +7,7 @@
 	import * as Alert from '$lib/components/ui/alert';
 	import { Badge } from '$lib/components/ui/badge';
 
+	
 	const visibleStrikes = writable([]);
 
 	let unsubscribe: () => void;

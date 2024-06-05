@@ -24,7 +24,8 @@
 
 	import { strikesresult } from '$lib/stores/strikes.ts';
 	import { dbstatus } from '$lib/stores/dbstatus.ts';
-
+    import { panestatus } from '$lib/stores/togglepane';
+    
 	const initialView: LatLngExpression = [-7.816177085162616, 110.29458648417666];
 	const markerLocations: Array<LatLngExpression> = [[-7.816177085162616, 110.29458648417666]];
 
@@ -36,9 +37,17 @@
 	}
 
 	$: latestStrike = $strikesresult.length ? $strikesresult[$strikesresult.length - 1] : null;
+
+    function togglePane() {
+		if ($panestatus==true) {
+        panestatus.set(false);
+        } else {
+            panestatus.set(true);   
+        }
+	}
 </script>
 
-<div class="relative w-full h-full overflow-hidden">
+<div class="relative w-full h-full overflow-hidden ">
 	<div class="absolute top-0 left-0 z-20 m-2 space-y-2">
 		<Badge variant="secondary">
 			<DigitalClock />
@@ -59,6 +68,16 @@
 	<div class="absolute bottom-0 left-0 z-30 m-2">
 		<LightningPopup />
 	</div>
+
+    <!-- <div class="absolute bottom-0 right-0 z-30 m-2">
+        <Button on:click={togglePane}>
+            {#if $panestatus==true}
+                Hide
+            {:else}
+                Show
+            {/if}
+        </Button>
+    </div> -->
 
 	<div class="h-full w-full">
 		<Leaflet view={initialView} zoom={12} class="h-full w-full">

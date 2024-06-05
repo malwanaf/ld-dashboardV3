@@ -1,5 +1,6 @@
 <script>
 	import { Pane, Splitpanes } from 'svelte-splitpanes';
+
 </script>
 
 <div class="w-screen h-screen bg-white dark:bg-black">

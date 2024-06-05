@@ -3,6 +3,7 @@
 	import L from 'leaflet';
 	import 'leaflet/dist/leaflet.css';
 	import { strikesresult } from '$lib/stores/strikes.ts';
+	import { specificstrikesresult } from '$lib/stores/specificStrike';
 
 	export let bounds: L.LatLngBoundsExpression | undefined = undefined;
 	export let view: L.LatLngExpression | undefined = undefined;
@@ -52,8 +53,45 @@
 		}
 
 		const strikeLayerGroup = L.layerGroup().addTo(map);
+		const specificStrikeLayerGroup = L.layerGroup().addTo(map);
 
 		const processedStrikes = new Set();
+		function onStrikeResult(id){
+			if ($strikesresult.filter(strike => strike.id === id).length > 0){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		const unsubscribe2 = specificstrikesresult.subscribe((specificStrikeData) => {
+			specificStrikeData.forEach((strike) => {
+				const radius = calculateRadius(strike.distance);
+				const color = getColorByIntensity(strike.intensity);
+				
+					const circle = L.circle(center, {
+					color: color, // Border color based on intensity
+					opacity: 0.8, // Border opacity
+					fillColor: color, // Fill color based on intensity
+					fillOpacity: 0, // Increased fill opacity
+					radius: radius,
+					weight: 6
+				}).addTo(specificStrikeLayerGroup);
+
+				if(onStrikeResult(strike.id)){
+					console.log("Strike exist");
+				}else{
+					// specificStrikeLayerGroup.removeLayer(circle);
+					console.log("Strike not exist");
+				}
+				if(onStrikeResult(strike.id)==false){
+					console.log("Strike not exist");
+				}
+			});		
+		});
+
+		
+		
+
 
 		const unsubscribe = strikesresult.subscribe((strikesData) => {
 			let delay = 0;
