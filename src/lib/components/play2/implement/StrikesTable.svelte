@@ -4,9 +4,7 @@
     import CaretSort from 'svelte-radix/CaretSort.svelte';
     import { toggleMode } from 'mode-watcher';
     import { Button } from '$lib/components/ui/button';
-    import { onMount, onDestroy } from 'svelte';
     import * as Table from '$lib/components/ui/table';
-    import ChevronLeft from 'svelte-radix/ChevronLeft.svelte';
     import * as Pagination from '$lib/components/ui/pagination';
     import Reload from 'svelte-radix/Reload.svelte';
     import { Label } from '$lib/components/ui/label';
@@ -15,7 +13,12 @@
     import { dbstatus } from '$lib/stores/dbstatus';
     import { specificstrikesresult } from '$lib/stores/specificStrike';
 
-
+    // Implement isActive (from MainComponent.svelte)
+    import { toggleIsActive } from '$lib/components/play2/toggleIsActive';
+    let items;
+  
+    $: items = $strikesresult;
+    // end of Implement isActive
 
     let currentPage = 1;
     let itemsPerPage = 10;
@@ -81,6 +84,7 @@
 
     $: paginatedItems = $strikesresult.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+
     function showSpecificStrike(id) {
         console.log('showing strike with id:', id);
         specificstrikesresult.set($strikesresult.filter(strike => strike.id === id));
@@ -105,6 +109,24 @@
 
     $: console.log($specificstrikesresult);
 
+    function formatDateTime(dateStr) {
+    let dateObj = new Date(dateStr);
+
+    let options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+      timeZone: 'Asia/Jakarta',
+      timeZoneName: 'short'
+    };
+
+    return dateObj.toLocaleString('id-ID', options);
+  }
 </script>
 
 <div class="flex flex-col h-full overflow-hidden p-4">
@@ -173,7 +195,9 @@
                                 </Button>
                             </Table.Head>
                             <Table.Head class="text-center">
-                                Actions
+                                <Button class="text-left pl-0" variant="ghost">
+                                    Actions
+                                </Button>
                             </Table.Head>
                         </Table.Row>
                     </Table.Header>
@@ -188,25 +212,16 @@
                                 </Table.Cell>
                             </Table.Row>
                         {:else}
-                            {#each paginatedItems as strike}
+                            {#each paginatedItems as strike (strike.id)}
                                 <Table.Row>
                                     <Table.Cell class="text-left">{strike.id}</Table.Cell>
-                                    <Table.Cell class="text-left">{strike.time}</Table.Cell>
+                                    <Table.Cell class="text-left">{formatDateTime(strike.time)}</Table.Cell>
                                     <Table.Cell class="text-left">{strike.distance} km</Table.Cell>
                                     <Table.Cell class="text-center">{strike.intensity}</Table.Cell>
                                     <Table.Cell class="text-center">
-                                        <Button on:click={() => toggleShowSpecificStrike(strike.id)}>
-                                            {isStrikeVisible(strike.id) ? 'Hide from Map' : 'Show on Map'}
+                                        <Button class="w-20" on:click={() => toggleIsActive(strike.id)}>
+                                            {strike.isActive ? 'Hide' : 'Show'}
                                         </Button>
-                                        <!-- <Button on:click={() => toggle(index)}>
-                                            {toggleStates[index] ? 'Deactivate' : 'Activate'}
-                                        </Button> -->
-
-                                        <!-- <Button type="button"
-                                        class:active={activeItemIds.includes(item.id)}
-                                        on:click={() => handleItemClick(item.id)}>
-                                        {item.id}
-                                        </Button> -->
                                     </Table.Cell>
                                 </Table.Row>
                             {/each}

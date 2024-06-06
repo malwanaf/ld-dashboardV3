@@ -89,6 +89,32 @@
 			});		
 		});
 
+
+		const unsubscribe3 = strikesresult.subscribe((StrikesData) => {
+			StrikesData.forEach((strike) => {
+				if(strike.isActive){
+					console.log("Strike Activated");
+				const radius = calculateRadius(strike.distance);
+				const color = getColorByIntensity(strike.intensity);
+				
+					const circle = L.circle(center, {
+					color: color, // Border color based on intensity
+					opacity: 0.8, // Border opacity
+					fillColor: color, // Fill color based on intensity
+					fillOpacity: 0, // Increased fill opacity
+					radius: radius,
+					weight: 6
+				}).addTo(specificStrikeLayerGroup);
+			}
+				else{
+					
+					// specificStrikeLayerGroup.removeLayer(circle);
+					console.log("Strike Deactivated");
+				}
+				
+			});		
+		});
+		
 		
 		
 

@@ -35,12 +35,20 @@
 			return newStrikes;
 		});
 	}
+	const secondsToAdd = 1; // For example, add 60 seconds
+
+// Create a new Date object representing the current date and time
+const currentDate = new Date();
+
+// Add the desired number of seconds to the current date and time
+currentDate.setSeconds(currentDate.getSeconds() + secondsToAdd);
 </script>
 
-<div class="mt-4">
-	{#each $visibleStrikes as strike (strike.time)}
+<div class="">
+	{#each $strikesresult as strike (strike.id)}
+		{#if new Date(strike.time) > currentDate}
 		<div in:fade={{ duration: 1000 }} out:fade={{ duration: 1000 }}>
-			<Button variant="indicator" class="space-x-3 pl-0">
+			<Button variant="indicator" class="space-x-3 pl-0 p-0">
 				{#if strike.intensity == 1}
 					<svg
 						width="2rem"
@@ -84,9 +92,10 @@
 						></path></svg
 					>
 				{/if}
-                <Button variant="default"><h3 class="scroll-m-20 text-2xl font-semibold tracking-tight">{strike.distance} km</h3></Button>
+                <Button variant="default" class="mr-0"><h3 class="scroll-m-20 text-2xl font-semibold tracking-tight">{strike.distance} km</h3></Button>
 				
 			</Button>
 		</div>
+		{/if}
 	{/each}
 </div>

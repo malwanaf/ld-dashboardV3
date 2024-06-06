@@ -2,7 +2,7 @@ import {io} from 'socket.io-client';
 import { dbstatus } from './stores/dbstatus';
 import { updateStrikesResult } from './stores/strikes';
 
-const socket = io("http://localhost:3000/");
+const socket = io("http://192.168.3.231:3000/");
 
 socket.on("connect", () => {
     socket.on("getfirst", (data) => {
